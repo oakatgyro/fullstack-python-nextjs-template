@@ -1,0 +1,3 @@
+# MD013/line-length - Line length
+# 1行の表示上限チェックは不要。
+MD013: false
