@@ -27,3 +27,28 @@ git config commit.template .gitmessage   # optional: prefilled template
 Allowed types: `feat`, `fix`, `docs`, `style`, `refactor`, `perf`, `test`, `build`,
 `ci`, `chore`, `revert`.
 Format: `type(scope): subject`.
+
+## Dependency Updates
+
+Dependabot watches all four ecosystems: `npm` (lp), `uv` (backend), `terraform`,
+`github-actions`. Weekly schedule, Monday 09:00 Asia/Tokyo. Auto-merge policy and
+rationale: [docs/adr/0001-dependabot-auto-merge-policy.md](docs/adr/0001-dependabot-auto-merge-policy.md).
+
+Auto-merge requires three GitHub-side settings on a fork or new clone:
+
+```bash
+gh api -X PATCH repos/OWNER/REPO \
+  -F allow_auto_merge=true -F delete_branch_on_merge=true
+
+gh api -X PUT repos/OWNER/REPO/branches/main/protection --input - <<'JSON'
+{
+  "required_status_checks": {"strict": true, "contexts": ["ci-lp", "ci-backend"]},
+  "enforce_admins": false,
+  "required_pull_request_reviews": null,
+  "restrictions": null
+}
+JSON
+```
+
+If you rename a CI job, update the `contexts` list above or branch protection will
+block merges indefinitely.
